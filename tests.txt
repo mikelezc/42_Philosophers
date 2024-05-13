@@ -1,0 +1,48 @@
+Tests de la hoja de correcciones:
+
+Do not test with more than 200 philosophers.
+
+Do not test with time_to_die or time_to_eat or time_to_sleep set to values lower than 60 ms.
+
+Examples:
+
+./philo 1 800 200 200	The philosopher should not eat and should die.
+./philo 5 800 200 200	No philosopher should die.
+./philo 5 800 200 200 7	No philosopher should die and the simulation should stop when every philosopher has eaten at least 7 times.
+./philo 4 410 200 200	No philosopher should die.
+./philo 4 310 200 100	One philosopher should die.
+
+Test with 2 philosophers and check the different times: a death delayed by more than 10 ms is unacceptable.
+
+./philo 2 800 200 200	No philosopher should die.
+./philo 2 401 200 200	No philosopher should die.
+./philo 2 400 200 200	One philosopher should die.
+
+Test with any values of your choice to verify all the requirements. 
+Ensure philosophers die at the right time, that they don't steal forks, and so forth.
+
+Test más duro con tres filósofos sobrando un solo milisegundo:
+
+./philo 3 310 103 103
+3 philos, con 310 de muerte, si comen 103 es 103*3 = 309
+tiene 1 milisegundo de margen hasta la muerte
+
+Lo mismo pero con dos filósofos:
+
+./philo 2 401 200 200
+
+Para comprobar fallos con los threads usar:
+
+-fsanitize=thread -g3
+
+Como siempre, para comprobar leaks de memoria:
+
+void	myleaks(void)
+{
+	system("leaks philo");
+}
+
+atexit(myleaks);
+
+
+
