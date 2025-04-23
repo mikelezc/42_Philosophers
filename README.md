@@ -119,6 +119,6 @@ The project is organized into the following components:
 - `start_dinner.c` - Start simulation and threads
 - `time.c` - Time-related utilities
 
-## License
+## Notes
 
 This project is part of the curriculum at [42 School](https://42.fr/).
