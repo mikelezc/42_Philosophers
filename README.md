@@ -1,76 +1,124 @@
 # Philosophers
 
-- 25 febrero 2024
+A C implementation of the classic Dining Philosophers Problem.
 
-Comienzo investigación y documentación de la nuevas funciones sugeridas por el subject.
+## Overview
 
-	Muy recomendable leer detenidamente este artículo:
-	https://medium.com/@jalal92/the-dining-philosophers-7157cc05315
+This project is an implementation of the Dining Philosophers Problem, a classic synchronization and concurrency problem in computer science. It simulates a scenario where a group of philosophers sit around a circular table, alternating between thinking, eating, and sleeping. The challenge is to ensure that all philosophers can eat without causing deadlocks or resource starvation.
 
-	Lista con algunos vídeos que he encontrado útiles para desarrollar este proyecto
-	https://youtube.com/playlist?list=PLYg292oZjGzZ_vpPhy79WYf9BFqjrVqvb&si=I6MUBARIOK_JSCyx
+## Problem Statement
 
-Empiezo a plantear estructura de carpetas, makefile y philo.h
+- A certain number of philosophers sit around a circular table
+- There is a fork between each pair of philosophers
+- Each philosopher needs two forks to eat (one from each side)
+- Philosophers can only do three things: eat, sleep, and think
+- If a philosopher doesn't eat for a specific amount of time, they will die
+- The simulation stops when a philosopher dies or when all philosophers have eaten a certain number of times
 
-- 28 febrero 2024
+## How to Build
 
-Estos días atrás he terminado la parte de parsing y he seguido revisando vídeos sobre la utilización de mutex y como evitar data races, y threads.
+Clone the repository and compile the program:
 
-- 6 marzo 2024
+```bash
+git clone git@github.com:mikelezc/42_Philosophers.git Philosophers_42
+cd Philosophers_42
+make
+```
 
-Varios días implementando la parte de "seteo del escenario", aún queda pero empiezo a avanzar en las siguientes partes del proyecto.
+The compilation will generate an executable named `philo`.
 
-Planteadas las estructuras que voy a utilizar.
+## Usage
 
-- 7 marzo 2024
+Execute the program with the following parameters:
 
-Avanzo con el planteamiento principal de "los turnos de comidas" y reviso como hacer la monitorización de los filósofos.
+```bash
+./philo number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]
+```
 
-- 8 marzo 2024
+Parameters:
+- `number_of_philosophers`: Number of philosophers and forks
+- `time_to_die`: Time in milliseconds after which a philosopher dies if they haven't started eating
+- `time_to_eat`: Time in milliseconds that a philosopher takes to eat
+- `time_to_sleep`: Time in milliseconds that a philosopher spends sleeping
+- `[number_of_times_each_philosopher_must_eat]`: Optional parameter, simulation stops when all philosophers have eaten at least this many times
 
-Pulo a fondo toda la parte de parseo para que el código sea lo más legible posible.
-Amplío y modifico las estructuras.
-Terminada toda la parte de inicio de mutex, seteo de las estructuras, y asignación de los tenedores. Ya se como poner la mesa entera con comensales y todo! (set_scenario).
-He empezado con la parte de Peter (parte de monitoreo).
+## Testing Guidelines
 
-- 10 marzo 2024
+### Constraints
 
-Estos dos últimos días he dejado planteado (con mucho curro) las acciones de los filósofos, así como herramientas laterales (sleep, etc)
+- Do not test with more than 200 philosophers
+- Do not test with time values lower than 60 ms for `time_to_die`, `time_to_eat`, or `time_to_sleep`
 
+### Test Cases
 
-- 11-12 marzo 2024
-Termino primer borrador del proyecto y pulo detalles de las funciones anteriores.
+Here are some test cases to validate the program:
 
-- 13 marzo 2024
-Primera revisión general con ayuda, para corrección de errores.
-Creo eat.c porque introduzco nuevas funciones de gestión de mutex y de lógica de reserva de tenedores para evitar deadlocks al aumentar el número de comensales.
-Cambio también la forma de reservar filósofos de mi programa ya que no era muy adecuada.
+1. `./philo 1 800 200 200`
+   - The philosopher should not eat and should die
 
-- 14 marzo 2024
-Segunda revisión general, limpieza y optimización del código.
-Limpio la copia de variables entre mis dos estructuras al haberlas enlazado mutuamente.
-Así evito redundancias en mis estructuras y las dejo lo más limpias posible.
+2. `./philo 5 800 200 200`
+   - No philosopher should die
 
-- 15 marzo 2024
-Pulido eat.c
-Experimento con diferentes valores como input de usleep para ganar velocidad.
-Limpieza de finish.c
+3. `./philo 5 800 200 200 7`
+   - No philosopher should die and the simulation should stop when every philosopher has eaten at least 7 times
 
-- 16 marzo 2024
-Pruebas finales, pulido de algunas variables y eliminación de código innecesario.
-Listo para entrega!
+4. `./philo 4 410 200 200`
+   - No philosopher should die
 
-- 20 marzo 2024
-Hoy he hecho mi primera corrección y todo ha salido bien.
-Sin embargo me he dado cuenta de un pequeño detalle repasando alguna cosa a posteriori.
-Cuando hay un comensal, el programa no salía porque faltaba la segunda comprobación de la condición del while de ph_acquire_forks.
-Es comprobar si mi bool me daba como que el comensal había terminado y así no se quedaba pillado al haber un comensal, puesto que en ese caso solo se maneja un tenedor. Un fallo tonto y casi imperceptible (ya que el programa realmente daba el resultado esperado con un comensal) pero que no quería dejar pasar por alto.
-He decidido cancelarlo y volver a presentarlo.
+5. `./philo 4 310 200 100`
+   - One philosopher should die
 
-- 23 marzo 2024
-He aprovechado estos días hasta que me deja hacer retry para seguir profundizando en diferentes tests. 
-También agrego un límite de hasta 200 comensales, y mínimo de 60 milisegundos en cada una de las acciones de los argumentos después de haber visto la hoja de correcciones.
+### Tests with 2 philosophers
 
-- 24 marzo 2024
+Test with 2 philosophers and verify timing precision (a death delayed by more than 10 ms is unacceptable):
 
-Entrega finalizada
+- `./philo 2 800 200 200` - No philosopher should die
+- `./philo 2 401 200 200` - No philosopher should die
+- `./philo 2 400 200 200` - One philosopher should die
+
+### Edge Cases
+
+Test with tight timing constraints:
+
+- `./philo 3 310 103 103`
+  - 3 philosophers, with 310 ms time to die
+  - Eating takes 103 ms, so 103 × 3 = 309 ms
+  - Only 1 ms margin before death
+
+- `./philo 2 401 200 200`
+  - Similar edge case with 2 philosophers
+
+### Debugging Techniques
+
+- For thread race condition detection:
+  ```
+  -fsanitize=thread -g3
+  ```
+
+- For memory leak checks:
+  ```c
+  void myleaks(void)
+  {
+      system("leaks philo");
+  }
+  
+  atexit(myleaks);
+  ```
+
+## Project Structure
+
+The project is organized into the following components:
+
+- `args.c` - Command-line argument processing
+- `eat.c` - Philosopher eating actions
+- `finish.c` - Termination and cleanup
+- `p_ther.c` - Monitoring thread functionality
+- `philo_actions.c` - Main philosopher behavior
+- `philo.c` - Entry point and initialization
+- `set_scenario.c` - Setup of environment and resources
+- `start_dinner.c` - Start simulation and threads
+- `time.c` - Time-related utilities
+
+## License
+
+This project is part of the curriculum at [42 School](https://42.fr/).
